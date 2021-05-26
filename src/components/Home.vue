@@ -91,11 +91,11 @@ export default {
     },
     // 获取左侧所有的菜单
     async getMenuList() {
-      const { data: res } = await this.$http.get('menus')
-      if (res.meta.status !== 200) {
-        return this.$message.error(res.meta.msg)
+      const { data: res } = await this.$http.get('menu/list')
+      if (res.status !== '200') {
+        return this.$message.error(res.msg)
       } else {
-        this.menulist = res.data
+        this.menulist = res.result
       }
       // console.log('获取左侧所有的菜单------')
       // console.log(res)
