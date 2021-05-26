@@ -1,0 +1,58 @@
+{
+  "id": "2337953",
+  "name": "vue_shop",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "14720050",
+      "name": "权限管理",
+      "font_class": "header-22",
+      "unicode": "e64e",
+      "unicode_decimal": 58958
+    },
+    {
+      "icon_id": "129261",
+      "name": "users",
+      "font_class": "users",
+      "unicode": "e8b8",
+      "unicode_decimal": 59576
+    },
+    {
+      "icon_id": "688096",
+      "name": "商品 购物袋2",
+      "font_class": "shangpingouwudai2",
+      "unicode": "e789",
+      "unicode_decimal": 59273
+    },
+    {
+      "icon_id": "2570077",
+      "name": "单据",
+      "font_class": "danju-tianchong",
+      "unicode": "e62a",
+      "unicode_decimal": 58922
+    },
+    {
+      "icon_id": "4766297",
+      "name": "area chart",
+      "font_class": "areachart",
+      "unicode": "e7af",
+      "unicode_decimal": 59311
+    },
+    {
+      "icon_id": "312594",
+      "name": "user",
+      "font_class": "user",
+      "unicode": "e64d",
+      "unicode_decimal": 58957
+    },
+    {
+      "icon_id": "348607",
+      "name": "lock",
+      "font_class": "lock",
+      "unicode": "eb3f",
+      "unicode_decimal": 60223
+    }
+  ]
+}
