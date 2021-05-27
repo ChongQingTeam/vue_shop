@@ -36,6 +36,7 @@
           <!--<pre>{{scope.row}}</pre>-->
         </el-table-column>
         <el-table-column type = "index" label = "#"></el-table-column>
+        <el-table-column label = "角色id" prop = "id"></el-table-column>
         <el-table-column label = "角色名称" prop = "roleName"></el-table-column>
         <el-table-column label = "角色描述" prop = "roleDesc"></el-table-column>
         <el-table-column label = "操作" v-slot = "scope">
@@ -158,12 +159,12 @@ export default {
   },
   methods: {
     async getRoleList() {
-      const { data: res } = await this.$http.get('roles')
+      const { data: res } = await this.$http.get('role/list')
       // console.log(res)
-      if (res.meta.status !== 200) {
+      if (res.status !== '200') {
         return this.$message.error('获取角色列表数据失败')
       } else {
-        this.rolesList = res.data
+        this.rolesList = res.result
         // console.log(this.rolesList)
       }
     },
@@ -177,8 +178,8 @@ export default {
         // console.log(valid)
         if (!valid) return
         // 可以发起添加用户的网络请求
-        const { data: res } = await this.$http.post('roles', this.addRoleForm)
-        if (res.meta.status !== 201) {
+        const { data: res } = await this.$http.post('role/role', this.addRoleForm)
+        if (res.status !== '200') {
           return this.$message.error('添加角色失败')
         } else {
           this.$message.success('添加角色成功')
@@ -195,11 +196,11 @@ export default {
     },
     // 展示编辑角色的对话框
     async showEditDialog(id) {
-      const { data: res } = await this.$http.get('roles/' + id)
-      if (res.meta.status !== 200) {
+      const { data: res } = await this.$http.get('role/role/' + id)
+      if (res.status !== '200') {
         return this.$message.error('查询角色信息失败')
       }
-      this.editForm = res.data
+      this.editForm = res.result
       this.editDialogVisable = true
       // console.log(id)
     },
@@ -215,9 +216,9 @@ export default {
         }
 
         // 发起修改角色的请求
-        const { data: res } = await this.$http.put('roles/' + this.editForm.roleId,
+        const { data: res } = await this.$http.put('role/role/' + this.editForm.id,
           { roleName: this.editForm.roleName, roleDesc: this.editForm.roleDesc })
-        if (res.meta.status !== 200) {
+        if (res.status !== '200') {
           return this.$message.error('修改角色信息失败')
         }
         // 关闭对话框
@@ -306,8 +307,8 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了删除角色操作')
       }
-      const { data: res } = await this.$http.delete('roles/' + id)
-      if (res.meta.status !== 200) {
+      const { data: res } = await this.$http.delete('role/role/' + id)
+      if (res.status !== '200') {
         return this.$message.error('删除角色失败')
       }
       this.$message.success('删除角色成功')
