@@ -18,28 +18,28 @@
         border>
         <!--是否有效-->
         <template v-slot:isok="scope">
-          <i class="el-icon-success" v-if="scope.row.cat_deleted===false" style="color: lightgreen"></i>
+          <i class="el-icon-success" v-if="scope.row.status===1" style="color: lightgreen"></i>
           <i class="el-icon-error" style="color: red" v-else></i>
         </template>
         <!--分级-->
-        <template v-slot:order="scope">
+        <!-- <template v-slot:order="scope">
           <el-tag size="mini" v-if="scope.row.cat_level===0">一级</el-tag>
           <el-tag size="mini" v-else-if="scope.row.cat_level===1" type="success">二级</el-tag>
           <el-tag size="mini" v-else type="warning">三级</el-tag>
-        </template>
+        </template> -->
         <!--操作-->
         <template v-slot:opt="scope">
-          <el-button @click="showEditCate(scope.row.cat_id)" type="primary" size="mini" icon = "el-icon-edit">编辑</el-button>
-          <el-button @click="deleteCateById(scope.row.cat_id)" type="danger" size="mini" icon = "el-icon-delete">删除</el-button>
+          <el-button @click="showEditCate(scope.row)" type="primary" size="mini" icon = "el-icon-edit">编辑</el-button>
+          <el-button @click="deleteCateById(scope.row.id)" type="danger" size="mini" icon = "el-icon-delete">删除</el-button>
         </template>
       </tree-table>
       <!--  分页区域-->
       <el-pagination
         @size-change = "handleSizeChange"
         @current-change = "handleCurrentChange"
-        :current-page = "queryInfo.pagenum"
+        :current-page = "queryInfo.pageIndex"
         :page-sizes = "[4, 6, 8, 10]"
-        :page-size = "queryInfo.pagesize"
+        :page-size = "queryInfo.pageSize"
         layout = "sizes,total,prev, pager, next, jumper"
         :total = "total">
       </el-pagination>
@@ -53,17 +53,26 @@
       <!--内容主体区-->
       <el-form :model = "addForm" :rules = "addFormRules" ref = "addFormRef" label-width = "80px"
                @keydown.enter.native = "addCate">
-        <el-form-item label = "分类名称" prop = "cat_name">
-          <el-input v-model = "addForm.cat_name"></el-input>
+        <el-form-item label = "分类名称" prop = "name">
+          <el-input v-model = "addForm.name"></el-input>
         </el-form-item>
-        <el-form-item label = "父级分类">
-          <el-cascader
-            v-model="selectKeys"
-            :options="parentCateList"
-            :props="{ expandTrigger: 'hover',value:'cat_id',label:'cat_name', children:'children' ,checkStrictly:true}"
-            @change="parentCateChanged"
-            clearable>
-          </el-cascader>
+         <el-form-item label = "图标" prop = "icon">
+          <el-input v-model = "addForm.icon"></el-input>
+        </el-form-item>
+         <el-form-item label = "状态" prop = "status">
+          <el-input v-model = "addForm.status"></el-input>
+        </el-form-item>
+        <el-form-item label = "备注" prop = "remark">
+          <el-input v-model = "addForm.remark"></el-input>
+        </el-form-item>
+         <el-form-item label = "排序" prop = "sortOrder">
+          <el-input v-model = "addForm.sortOrder"></el-input>
+        </el-form-item>
+        <el-form-item label = "是否为父节点" prop = "isParent">
+          <el-input v-model = "addForm.isParent"></el-input>
+        </el-form-item>
+        <el-form-item label = "父节点id" prop = "parentId">
+          <el-input v-model = "addForm.parentId"></el-input>
         </el-form-item>
       </el-form>
       <!--底部按钮区域-->
@@ -81,8 +90,26 @@
       <!--内容主体区-->
       <el-form :model = "editCateForm" :rules = "addFormRules" ref = "editFormRef" label-width = "80px"
                @keydown.enter.native = "editCate">
-        <el-form-item label = "分类名称" prop = "cat_name">
-          <el-input v-model = "editCateForm.cat_name"></el-input>
+        <el-form-item label = "分类名称" prop = "name">
+          <el-input v-model = "editCateForm.name"></el-input>
+        </el-form-item>
+         <el-form-item label = "图标" prop = "icon">
+          <el-input v-model = "editCateForm.icon"></el-input>
+        </el-form-item>
+         <el-form-item label = "状态" prop = "status">
+          <el-input v-model = "editCateForm.status"></el-input>
+        </el-form-item>
+        <el-form-item label = "备注" prop = "remark">
+          <el-input v-model = "editCateForm.remark"></el-input>
+        </el-form-item>
+         <el-form-item label = "排序" prop = "sortOrder">
+          <el-input v-model = "editCateForm.sortOrder"></el-input>
+        </el-form-item>
+        <el-form-item label = "是否为父节点" prop = "isParent">
+          <el-input v-model = "editCateForm.isParent"></el-input>
+        </el-form-item>
+        <el-form-item label = "父节点id" prop = "parentId">
+          <el-input v-model = "editCateForm.parentId"></el-input>
         </el-form-item>
       </el-form>
       <!--底部按钮区域-->
@@ -102,8 +129,8 @@ export default {
       queryInfo: {
         // 表示显示 3 层分类列表
         type: 3,
-        pagenum: 1,
-        pagesize: 6
+        pageIndex: 1,
+        pageSize: 10
       },
       // 商品分类的数据列表
       cateList: [],
@@ -113,8 +140,16 @@ export default {
       // 为table指定列的定义
       columns: [
         {
+          label: '分类ID',
+          prop: 'id'
+        },
+        {
           label: '分类名称',
-          prop: 'cat_name'
+          prop: 'name'
+        },
+        {
+          label: '备注',
+          prop: 'remark'
         },
         {
           label: '是否有效',
@@ -122,12 +157,12 @@ export default {
           type: 'template',
           template: 'isok'
         },
-        {
-          label: '分级',
-          // 将当前列定义为模板列
-          type: 'template',
-          template: 'order'
-        },
+        // {
+        //   label: '分级',
+        //   // 将当前列定义为模板列
+        //   type: 'template',
+        //   template: 'order'
+        // },
         {
           label: '操作',
           // 将当前列定义为模板列
@@ -161,32 +196,32 @@ export default {
   },
   methods: {
     async getCateList() {
-      const { data: res } = await this.$http.get('categories', { params: this.queryInfo })
-      if (res.meta.status !== 200) {
+      const { data: res } = await this.$http.get('/catalog/list', { params: this.queryInfo })
+      if (res.status !== '200') {
         return this.$message.error('获取商品分类失败')
       }
       // console.log(res.data)
       // 把数据列表赋值
-      this.cateList = res.data.result
-      this.total = res.data.total
+      this.cateList = res.result
+      this.total = res.count
     },
     // 监听pageSize的参数对象
     handleSizeChange(newSize) {
       // console.log(newSize)
-      this.queryInfo.pagesize = newSize
+      this.queryInfo.pageSize = newSize
       this.getCateList()
     },
     // 监听 页码值 的改变
     handleCurrentChange(newPage) {
       // console.log(newPage)
-      this.queryInfo.pagenum = newPage
+      this.queryInfo.pageIndex = newPage
       this.getCateList()
     },
     // 点击按钮，展示添加分类的对话框
     showAddDialog() {
       this.addDialogVisible = true
       // 获取父级分类数据列表
-      this.addParentCateList()
+      // this.addParentCateList()
     },
     // 监听添加分类对话框的关闭事件
     addDialogClosed() {
@@ -224,8 +259,8 @@ export default {
       this.$refs.addFormRef.validate(async valid => {
         // console.log(valid)
         if (!valid) return
-        const { data: res } = await this.$http.post('categories', this.addForm)
-        if (res.meta.status !== 201) {
+        const { data: res } = await this.$http.post('/catalog/add_or_update', this.addForm)
+        if (res.status !== '200') {
           return this.$message.error('添加分类失败')
         }
         this.$message.success('添加分类成功')
@@ -234,13 +269,8 @@ export default {
       })
     },
     // 显示编辑分类名称弹框
-    async showEditCate(id) {
-      // console.log(id)
-      const { data: res } = await this.$http.get('categories/' + id)
-      if (res.meta.status !== 200) {
-        return this.$message.error('获取该分类失败')
-      }
-      this.editCateForm = res.data
+    async showEditCate(item) {
+      this.editCateForm = item
       this.editDialogVisible = true
     },
     // 关闭编辑分类名称弹框事件
@@ -251,9 +281,8 @@ export default {
     async editCate() {
       this.$refs.editFormRef.validate(async valid => {
         if (!valid) { return }
-        const { data: res } = await this.$http.put('categories/' + this.editCateForm.cat_id,
-          { cat_name: this.editCateForm.cat_name })
-        if (res.meta.status !== 200) {
+        const { data: res } = await this.$http.post('/catalog/add_or_update', this.editCateForm)
+        if (res.status !== '200') {
           return this.$message.error('编辑该分类失败')
         }
         this.$message.success('编辑该分类成功')
@@ -262,7 +291,7 @@ export default {
       })
     },
     // 弹框提示是否删除
-    async deleteCateById(id) {
+    async deleteCateById(idparam) {
       const confirmResult = await this.$confirm('此操作将删除该分类, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -273,8 +302,8 @@ export default {
       if (confirmResult !== 'confirm') {
         return this.$message.info('取消了删除该分类操作')
       }
-      const { data: res } = await this.$http.delete('categories/' + id)
-      if (res.meta.status !== 200) {
+      const { data: res } = await this.$http.get('/catalog/delete', { params: { id: idparam } })
+      if (res.status !== '200') {
         return this.$message.error('删除该分类失败')
       } else {
         // 此处后台如果直接返回的数据为最新的分类列表最好，可以不用再次请求数据
