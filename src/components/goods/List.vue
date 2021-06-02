@@ -16,13 +16,36 @@
       <!-- 商品列表区域 -->
       <el-table :data = "goodslist" border stripe max-height = "500">
         <el-table-column type = "index" label = "#"></el-table-column>
-        <el-table-column label = "商品名称" prop = "goods_name"></el-table-column>
-        <el-table-column label = "价格（元）" prop = "goods_price" width = "90px"></el-table-column>
-        <el-table-column label = "商品数量" prop = "goods_number" width = "70px"></el-table-column>
-        <el-table-column label = "商品重量" prop = "goods_weight" width = "70px"></el-table-column>
-        <el-table-column label = "创建时间" width = "150px" v-slot = "scope">
-          {{ scope.row.add_time | dateFormat }}
+        <el-table-column label = "商品名称" prop = "title"></el-table-column>
+        <el-table-column label = "商品卖点" prop = "sellPoint"></el-table-column>
+        <el-table-column label = "价格（元）" prop = "price" width = "90px"></el-table-column>
+        <el-table-column label = "商品数量" prop = "num" width = "70px"></el-table-column>
+        <el-table-column label = "限购数量" prop = "limitNum" width = "70px"></el-table-column>       
+        <el-table-column label = "商品分类" prop = "catalog" width = "70px"></el-table-column>       
+        <el-table-column label = "商品描述" prop = "itemDesc" width = "70px"></el-table-column>
+        <el-table-column label="商品图片">
+          <template slot-scope="scope">
+            <img :src="scope.row.image" style="height: 50px"/>
+          </template>
         </el-table-column>
+        <el-table-column property="menusstate" label="是否上架">
+          <template scope="scope">
+          <el-switch
+              on-text ="是"
+              off-text = "否"
+              on-color="#5B7BFA"
+              off-color="#dadde5"
+              v-model="scope.row.status" 
+              @change=change(scope.$index,scope.row)                
+          >
+          </el-switch>
+          </template>
+      </el-table-column>
+
+               
+        <!-- <el-table-column label = "创建时间" width = "150px" v-slot = "scope">
+          {{ scope.row.add_time | dateFormat }}
+        </el-table-column> -->
         <!--独占默认插槽，直接用在组件上-->
         <!--<el-table-column label = "状态" v-slot = "scope">
           &lt;!&ndash;{{scope.row}} 每一行均为一个商品对象&ndash;&gt;
@@ -76,13 +99,14 @@ export default {
   },
   methods: {
     async getGoodsList() {
-      const { data: res } = await this.$http.get('goods', { params: this.queryInfo })
+      const { data: res } = await this.$http.post('/item/list', { params: this.queryInfo })
       // console.log(res)
-      if (res.meta.status !== 200) {
+      debugger
+      if (res.status !== '200') {
         return this.$message.error('获取商品列表数据失败')
       } else {
-        this.goodslist = res.data.goods
-        this.total = res.data.total
+        this.goodslist = res.result
+        this.total = res.result.length
       }
     },
     queryGoodsList() {
