@@ -41,7 +41,7 @@
         </el-col>
       </el-row>
       <!-- 商品列表区域 -->
-      <el-table :data = "goodslist" border stripe max-height = "500">
+      <el-table :data = "goodslist" border stripe max-height = "930">
         <el-table-column type = "index" label = "#"></el-table-column>
         <el-table-column label = "商品名称" prop = "title"></el-table-column>
         <el-table-column label = "商品卖点" prop = "sellPoint"></el-table-column>
@@ -50,9 +50,19 @@
         <el-table-column label = "限购数量" prop = "limitNum" width = "70px"></el-table-column>
         <el-table-column label = "商品分类" prop = "catalog" width = "70px"></el-table-column>
         <!-- <el-table-column label = "商品描述" prop = "itemDesc" width = "70px"></el-table-column> -->
-        <el-table-column label="商品图片">
+        <el-table-column label="商品图片"  prop="pcoverimg" align="center">
           <template slot-scope="scope">
-            <img v-for="item in scope.row.image" v-bind:key="item" :src="item" width="40" height="40" class="head_pic"/>
+            <span v-for="(item,index) in scope.row.image" :key="index">
+              <el-popover placement="left" trigger="click" width="300">
+                <!-- <img :src="item" width="100%" /> -->
+                <img
+                    slot="reference"
+                    :src="item"
+                    :alt="item"
+                    style="max-height: 100px;max-width: 100px; padding: 5px"
+                />
+              </el-popover>
+            </span>
           </template>
         </el-table-column>
         <el-table-column property="menusstate" label="是否上架">
