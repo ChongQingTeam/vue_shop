@@ -3,13 +3,40 @@
     <el-card>
       <!--搜索与添加区域-->
       <el-row :gutter = "20">
-        <el-col :span = "8">
-          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入内容"
-                    v-model = "queryInfo.query">
-            <el-button @click = "queryGoodsList" slot = "append" icon = "el-icon-search"></el-button>
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品名称"
+                    v-model = "queryInfo.title">
           </el-input>
         </el-col>
-        <el-col :span = "4">
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品卖点"
+                    v-model = "queryInfo.sellPoint">
+          </el-input>
+        </el-col>
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品起始价钱"
+                    v-model = "queryInfo.beginPrice">
+          </el-input>
+        </el-col>
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品结束价钱"
+                    v-model = "queryInfo.endPrice">
+          </el-input>
+        </el-col>
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品分类"
+                    v-model = "queryInfo.catalog">
+          </el-input>
+        </el-col>
+        <el-col :span = "2">
+          <el-input clearable @clear = "getGoodsList" @keydown.enter.native = "queryGoodsList" placeholder = "请输入商品描述"
+                    v-model = "queryInfo.itemDesc">
+          </el-input>
+        </el-col>
+        <el-col :span = "1.5">
+          <el-button @click = "queryGoodsList" type = "primary">查询商品</el-button>
+        </el-col>
+        <el-col :span = "1">
           <el-button @click = "goAddPage" type = "primary">添加商品</el-button>
         </el-col>
       </el-row>
@@ -20,41 +47,24 @@
         <el-table-column label = "商品卖点" prop = "sellPoint"></el-table-column>
         <el-table-column label = "价格（元）" prop = "price" width = "90px"></el-table-column>
         <el-table-column label = "商品数量" prop = "num" width = "70px"></el-table-column>
-        <el-table-column label = "限购数量" prop = "limitNum" width = "70px"></el-table-column>       
-        <el-table-column label = "商品分类" prop = "catalog" width = "70px"></el-table-column>       
-        <el-table-column label = "商品描述" prop = "itemDesc" width = "70px"></el-table-column>
+        <el-table-column label = "限购数量" prop = "limitNum" width = "70px"></el-table-column>
+        <el-table-column label = "商品分类" prop = "catalog" width = "70px"></el-table-column>
+        <!-- <el-table-column label = "商品描述" prop = "itemDesc" width = "70px"></el-table-column> -->
         <el-table-column label="商品图片">
           <template slot-scope="scope">
-            <img :src="scope.row.image" style="height: 50px"/>
+            <img v-for="item in scope.row.image" v-bind:key="item" :src="item" width="40" height="40" class="head_pic"/>
           </template>
         </el-table-column>
         <el-table-column property="menusstate" label="是否上架">
           <template scope="scope">
-          <el-switch
-              on-text ="是"
-              off-text = "否"
-              on-color="#5B7BFA"
-              off-color="#dadde5"
-              v-model="scope.row.status" 
-              @change=change(scope.$index,scope.row)                
-          >
-          </el-switch>
+            <el-switch
+                :active-value = "1"
+                :inactive-value = "0"
+                v-model="scope.row.status"
+                @change=change(scope.$index,scope.row)>
+            </el-switch>
           </template>
-      </el-table-column>
-
-               
-        <!-- <el-table-column label = "创建时间" width = "150px" v-slot = "scope">
-          {{ scope.row.add_time | dateFormat }}
-        </el-table-column> -->
-        <!--独占默认插槽，直接用在组件上-->
-        <!--<el-table-column label = "状态" v-slot = "scope">
-          &lt;!&ndash;{{scope.row}} 每一行均为一个商品对象&ndash;&gt;
-          &lt;!&ndash;从数据库中取回的 goodslist 中的  &ndash;&gt;
-          <el-tag type="danger" v-if="scope.row.goods_state==='0'">未通过</el-tag>
-          <el-tag type="primary" v-else-if="scope.row.goods_state==='1'">审核中</el-tag>
-          <el-tag type="success" v-else-if="scope.row.goods_state==='2'">已审核</el-tag>
-          <el-tag type="warning" else>状态未知</el-tag>
-        </el-table-column>-->
+        </el-table-column>
         <el-table-column label = "操作" class = "" v-slot = "scope" width = "120px">
           <el-button @click = "goEditPage(scope.row.goods_id)" type = "primary" icon = "el-icon-edit"
                      size = "mini"></el-button>
@@ -66,9 +76,9 @@
       <el-pagination
         @size-change = "handleSizeChange"
         @current-change = "handleCurrentChange"
-        :current-page = "queryInfo.pagenum"
+        :current-page = "queryInfo.pageIndex"
         :page-sizes = "[4, 6, 8, 10]"
-        :page-size = "queryInfo.pagesize"
+        :page-size = "queryInfo.pageSize"
         layout = "sizes,total,prev, pager, next, jumper"
         :total = "total"
         background>
@@ -84,11 +94,16 @@ export default {
     return {
       // 获取商品列表的参数对象
       queryInfo: {
-        query: '',
+        itemDesc: '',
+        catalog: '',
+        sellPoint: '',
+        beginPrice: null,
+        endPrice: null,
+        title: '',
         // 当前页码
-        pagenum: 1,
+        pageIndex: 1,
         // 当前每页显示多少条数据
-        pagesize: 8
+        pageSize: 10
       },
       total: 0,
       goodslist: []
@@ -99,31 +114,37 @@ export default {
   },
   methods: {
     async getGoodsList() {
-      const { data: res } = await this.$http.post('/item/list', { params: this.queryInfo })
+      var that = this
+      const { data: res } = await this.$http.post('/item/list', that.queryInfo)
       // console.log(res)
       debugger
       if (res.status !== '200') {
         return this.$message.error('获取商品列表数据失败')
       } else {
         this.goodslist = res.result
-        this.total = res.result.length
+        this.total = res.count
       }
     },
     queryGoodsList() {
-      this.queryInfo.pagenum = 1
+      this.queryInfo.pageIndex = 1
       this.getGoodsList()
-      this.queryInfo.query = ''
+      this.queryInfo.title = ''
+      this.queryInfo.sellPoint = ''
+      this.queryInfo.catalog = ''
+      this.queryInfo.itemDesc = ''
+      this.queryInfo.beginPrice = null
+      this.queryInfo.endPrice = null
     },
     // 监听pageSize的参数对象
     handleSizeChange(newSize) {
       // console.log(newSize)
-      this.queryInfo.pagesize = newSize
+      this.queryInfo.pageSize = newSize
       this.getGoodsList()
     },
     // 监听 页码值 的改变
     handleCurrentChange(newPage) {
       // console.log(newPage)
-      this.queryInfo.pagenum = newPage
+      this.queryInfo.pageIndex = newPage
       this.getGoodsList()
     },
     // 根据商品ID删除对应的商品信息
