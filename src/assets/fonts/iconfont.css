@@ -43,3 +43,14 @@
   content: "\eb3f";
 }
 
+.icon-crawler-manage:before {
+  content: "\e8b8";
+}
+
+.icon-crawler-config:before {
+  content: "\e8b8";
+}
+
+.icon-crawler-run:before {
+  content: "\e8b8";
+}

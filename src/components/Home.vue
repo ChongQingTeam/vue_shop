@@ -70,6 +70,9 @@ export default {
         103: 'iconfont icon-header-22',
         101: 'iconfont icon-shangpingouwudai2',
         102: 'iconfont icon-danju-tianchong',
+        155: 'iconfont icon-crawler-manage',
+        156: 'iconfont icon-crawler-config',
+        157: 'iconfont icon-crawler-run',
         145: 'iconfont icon-areachart'
       },
       isCollpase: false,

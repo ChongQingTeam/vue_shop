@@ -37,6 +37,9 @@ const EditGoods = () => import(/* webpackChunkName: "GoodsList_AddGoods_EditGood
 const Order = () => import(/* webpackChunkName: "Order_Report" */ '@/components/order/Order')
 const Report = () => import(/* webpackChunkName: "Order_Report" */ '@/components/report/Report')
 
+const crawlerConfig = () => import(/* webpackChunkName: "Order_Report" */ '@/components/crawler/Config')
+const crawlerRun = () => import(/* webpackChunkName: "Order_Report" */ '@/components/crawler/Run')
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -60,7 +63,9 @@ const routes = [
       { path: '/goods/add', name: 'add', component: AddGoods },
       { path: '/goods/edit/:goodsId', name: 'edit', component: EditGoods, props: true },
       { path: '/orders', name: 'orders', component: Order },
-      { path: '/reports', name: 'reports', component: Report }
+      { path: '/reports', name: 'reports', component: Report },
+      { path: '/crawler/config', name: 'config', component: crawlerConfig },
+      { path: '/crawler/run', name: 'run', component: crawlerRun }
     ]
   }
 ]
